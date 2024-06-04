@@ -2,7 +2,7 @@ module.exports = (sequelize, Sequelize) => {
     const Order = sequelize.define("order", {
         status: {
             type: Sequelize.ENUM("Packing", "Shipping"),
-            defaultValue: "Shipping",
+            defaultValue: "Packing",
             allowNull: false,
         },
         shipTo: {
