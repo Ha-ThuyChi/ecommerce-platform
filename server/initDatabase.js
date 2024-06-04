@@ -14,6 +14,7 @@ const Promotion = db.promotion;
 const Admin = db.admin;
 const Property = db.property;
 const Product_property = db.product_property;
+const User = db.user;
 
 // Association
 Seller.hasMany(Shop);
@@ -25,7 +26,8 @@ Cart.hasMany(Cart_item);
 Product.hasMany(Cart_item);
 Product.hasMany(Product_property);
 Property.hasMany(Product_property);
-
+User.hasOne(Seller);
+User.hasOne(Buyer);
 
 
 // Connect to database
@@ -48,6 +50,7 @@ async function syncModel() {
     await db.sequelize.drop({logging: false});
 
     // init models and add them to the exported db object
+    await User.sync({alert:true, logging: false});
     await Seller.sync({alert: true, logging: false});
     await Buyer.sync({alert: true, logging: false});
     await Shop.sync({alert:true, logging: false});
@@ -58,13 +61,14 @@ async function syncModel() {
     await Promotion.sync({alert: true, logging: false});
     await Admin.sync({alert: true, logging: false});
     await Property.sync({alert:true, logging: false});
-    await Product_property.sync({alert:true, logging: false, logging: false});
+    await Product_property.sync({alert:true, logging: false});
+
 
     Admin.create({
         name: "admin1",
         username: "admin1",
         password: "$2b$10$/j0L1gbBUDzdu3XsxHPIBOCpyP/hDMwFig8FSNAfh2WXVXZzIi3ba"
-    })
+    });
 
     console.log("Finish initialize database.")
 }

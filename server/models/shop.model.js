@@ -20,8 +20,5 @@ module.exports = (sequelize, Sequelize) => {
         tableName: "shops", 
         timeStamps: true,
     });
-    // Shop.associate = (models) => {
-    //     Seller.hasMany(models.Shop, {foreignKey: "sellerId"})
-    // };
     return Shop;
 }

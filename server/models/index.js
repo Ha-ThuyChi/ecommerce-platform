@@ -24,5 +24,6 @@ db.promotion = require("./promotion.model.js")(sequelize, Sequelize);
 db.admin = require("./admin.model.js")(sequelize, Sequelize);
 db.property = require("./property.model.js")(sequelize, Sequelize);
 db.product_property = require("./product_property.model.js")(sequelize, Sequelize);
+db.user = require("./user.model.js")(sequelize, Sequelize);
 
 module.exports = db;
