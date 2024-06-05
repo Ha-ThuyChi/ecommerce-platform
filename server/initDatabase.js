@@ -67,8 +67,14 @@ async function syncModel() {
     Admin.create({
         name: "admin1",
         username: "admin1",
-        password: "$2b$10$/j0L1gbBUDzdu3XsxHPIBOCpyP/hDMwFig8FSNAfh2WXVXZzIi3ba"
+        password: "$2b$10$Mjfpl3pCzbJ8NcQu.Bi64OhTf2BFkVTffHvjdnVprp4VZygKTyDkK"
     });
+    User.create({
+        name: "user2",
+        password: "$2b$10$Mjfpl3pCzbJ8NcQu.Bi64OhTf2BFkVTffHvjdnVprp4VZygKTyDkK",
+        dob: "01-01-2001",
+        email: "user2@gmail.com"
+    })
 
     console.log("Finish initialize database.")
 }

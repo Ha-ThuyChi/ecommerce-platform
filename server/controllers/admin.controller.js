@@ -1,5 +1,7 @@
 const db = require("../models");
 const Admin = db.admin;
+const Seller = db.seller;
+const User = db.user;
 const { hashPassword }= require("./hashPassword");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -63,4 +65,34 @@ exports.signIn = (req, res) => {
     }).catch(error => {
         res.status(500).send({success: false, message: error.message});
     })
+};
+
+// Disable/Enable seller account
+exports.editStatusSellerAccount = (req, res) => {
+    Seller.update({
+        activeStatus: req.body.activeStatus,
+    }, {
+        where: { 
+            userId: req.body.userId,
+        }
+    }).then(() => {
+        res.status(200).send({success: true, message: "Status of seller account is edited."})
+    }).catch(error => {
+        res.status(500).send({success: false, message: error.message})
+    }) 
+}
+
+// Disable/Enable user account
+exports.editStatusUserAccount = (req, res) => {
+    User.update({
+        activeStatus: req.body.activeStatus,
+    }, {
+        where: { 
+            id: req.body.userId,
+        }
+    }).then(() => {
+        res.status(200).send({success: true, message: "Status of user account is edited."})
+    }).catch(error => {
+        res.status(500).send({success: false, message: error.message})
+    }) 
 }

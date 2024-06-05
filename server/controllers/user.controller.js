@@ -47,6 +47,9 @@ exports.signIn = (req, res) => {
         }
     }).then((data) => {
         if (data) {
+            if (!data.activeStatus) {
+                return res.status(400).send({success: false, message: "Account is disable."});
+            }
             // check password
             bcrypt.compare(password, data.password, function (err, result) {
                 if (err) {
@@ -57,7 +60,7 @@ exports.signIn = (req, res) => {
                     const token = jwt.sign(
                         {data}, 
                         process.env.JWT_SECRET, 
-                        {expiresIn: '1h'}
+                        // {expiresIn: '1h'}
                     );
                     Seller.findOne({
                         where: {
