@@ -1,34 +1,50 @@
 const db = require("../models");
-const Admin = db.admin;
-const Seller = db.seller;
 const User = db.user;
+const Role = db.role;
+const User_role = db.user_role;
+
 const { hashPassword }= require("./hashPassword");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 exports.createAdmin = (req, res) => {
-    Admin.findOne({
+    // Check if email is valid
+    User.findOne({
         where: {
-            username: req.body.username,
+            email: req.body.email,
         }
     }).then((result) => {
         if (result) {
-            res.status(409).send({success: false, message: "Username is existed."})
-        } else {
+            res.status(409).send({success: false, message: "Email is existed."})
+        } else { // No matched email => valid to create new account
             const password = req.body.password
+            // Hashing password
             hashPassword(password).then(({hash, salt}) => {
-                Admin.create({
+                // Create user
+                User.create({
                     name: req.body.name,
-                    username: req.body.username,
+                    email: req.body.email,
                     password: hash,
-                }).then(() => {
-                    res.status(200).send({success: true, message: "Admin account is created."})
+                }).then((user) => {
+                    // Find id of admin in role table
+                    Role.findOne({
+                        where: {name: "Admin"}
+                    }).then((role) => {
+                        // Create user with roleId and userId
+                        User_role.create({
+                            userId: user.id,
+                            roleId: role.id,
+                        }).then(() => {
+                            res.status(200).send({success: true, message: "Admin account is created."})
+                        }).catch(error => {
+                            res.status(500).send({success: false, message: error.message})
+                        });;
+                    });
                 }).catch(error => {
                     res.status(500).send({success: false, message: error.message})
-                }) 
-            })
-            
-        }
+                }); 
+            }); 
+        };
     }).catch ((error) => {
         res.status(500).send({success: false, message: error.message})
     });
@@ -38,7 +54,7 @@ exports.signIn = (req, res) => {
     const password = req.body.password;
     Admin.findOne({
         where: {
-            username: req.body.username, // check username
+            email: req.body.email, // check email
         }
     }).then((data) => {
         if (data) {
@@ -69,7 +85,7 @@ exports.signIn = (req, res) => {
 
 // Disable/Enable seller account
 exports.editStatusSellerAccount = (req, res) => {
-    Seller.update({
+    User_role.update({
         activeStatus: req.body.activeStatus,
     }, {
         where: { 
@@ -95,4 +111,5 @@ exports.editStatusUserAccount = (req, res) => {
     }).catch(error => {
         res.status(500).send({success: false, message: error.message})
     }) 
-}
+};
+
