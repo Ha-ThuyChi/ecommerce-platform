@@ -1,33 +1,35 @@
 require("dotenv").config();
 const mysql = require("mysql2/promise");
-const Sequelize = require("sequelize");
+const { hashPassword } = require("./controllers/hashPassword");
 
 const db = require("./models");
-const Seller = db.seller;
 const Product = db.product;
 const Shop = db.shop;
 const Order = db.order;
-const Buyer = db.buyer;
 const Cart = db.cart;
 const Cart_item = db.cart_item;
 const Promotion = db.promotion;
-const Admin = db.admin;
 const Property = db.property;
 const Product_property = db.product_property;
 const User = db.user;
+const Role = db.role;
+const User_role = db.user_role;
 
 // Association
-Seller.hasMany(Shop);
+User.hasMany(Shop);
+User.hasMany(Order);
+User.hasOne(Cart);
 Shop.hasMany(Product);
-Buyer.hasMany(Order);
 Shop.hasMany(Order);
-Buyer.hasOne(Cart);
-Cart.hasMany(Cart_item);
-Product.hasMany(Cart_item);
-Product.hasMany(Product_property);
-Property.hasMany(Product_property);
-User.hasOne(Seller);
-User.hasOne(Buyer);
+
+Cart.belongsToMany(Product, { through: Cart_item });
+Product.belongsToMany(Cart, { through: Cart_item });
+
+Product.belongsToMany(Property, {through: Product_property});
+Property.belongsToMany(Product, {through: Product_property});
+
+User.belongsToMany(Role, { through: User_role });
+Role.belongsToMany(User, { through: User_role });
 
 
 // Connect to database
@@ -51,30 +53,36 @@ async function syncModel() {
 
     // init models and add them to the exported db object
     await User.sync({alert:true, logging: false});
-    await Seller.sync({alert: true, logging: false});
-    await Buyer.sync({alert: true, logging: false});
     await Shop.sync({alert:true, logging: false});
     await Product.sync({alert:true, logging: false});
     await Order.sync({alert: true, logging: false});
     await Cart.sync({alert: true, logging: false});
     await Cart_item.sync({alert: true, logging: false});
     await Promotion.sync({alert: true, logging: false});
-    await Admin.sync({alert: true, logging: false});
     await Property.sync({alert:true, logging: false});
     await Product_property.sync({alert:true, logging: false});
+    await Role.sync({alert:true, logging: false});
+    await User_role.sync({alert:true, logging: false});
 
-
-    Admin.create({
-        name: "admin1",
-        username: "admin1",
-        password: "$2b$10$Mjfpl3pCzbJ8NcQu.Bi64OhTf2BFkVTffHvjdnVprp4VZygKTyDkK"
-    });
+    // for testing
+    const pwd = await hashPassword("password");
     User.create({
         name: "user2",
-        password: "$2b$10$Mjfpl3pCzbJ8NcQu.Bi64OhTf2BFkVTffHvjdnVprp4VZygKTyDkK",
+        password: pwd,
         dob: "01-01-2001",
         email: "user2@gmail.com"
-    })
+    });
+
+    // Add roles
+    await Role.create({
+        name: "Admin",
+    });
+    await Role.create({
+        name: "Seller",
+    });
+    await Role.create({
+        name: "Buyer",
+    });
 
     console.log("Finish initialize database.")
 }

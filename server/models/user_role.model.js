@@ -1,13 +1,13 @@
 module.exports = (sequelize, Sequelize) => {
-    const Seller = sequelize.define("seller", {
+    const User_role = sequelize.define("user_role", {
         activeStatus: {
             type: Sequelize.BOOLEAN,
             defaultValue: true,
-        },
+        }
     },
     {
-        tableName: "sellers", 
+        tableName: "user_roles", 
         timeStamps: true,
     });
-    return Seller;
+    return User_role;
 }

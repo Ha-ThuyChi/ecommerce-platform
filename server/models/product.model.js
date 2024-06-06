@@ -20,9 +20,5 @@ module.exports = (sequelize, Sequelize) => {
         tableName: "products", 
         timeStamps: true,
     });
-    // Product.associate = (models) => {
-    //     Product.belongsTo(models.Shop, { foreignKey: 'shopId' });
-    // };
-
     return Product;
 }
