@@ -5,6 +5,9 @@ const authenticateToken = require("./authenticate.route");
 
 router.use(authenticateToken);
 
-// router.post("/creat", controller.createShop);
+router.post("/create-product", controller.createProduct);
+router.delete("/delete-product/:productId", controller.deleteProduct);
+router.get("/view-product/:productId", controller.viewProduct);
+router.put("/edit-product", controller.editProduct);
 
 module.exports = router;

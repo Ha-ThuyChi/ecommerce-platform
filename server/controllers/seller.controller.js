@@ -1,7 +1,2 @@
 const db = require("../models");
-
-
-// exports.createShop = (req, res) => {
-
-// }
-
+const Seller = db.seller;

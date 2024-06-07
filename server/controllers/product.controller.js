@@ -8,6 +8,7 @@ exports.createProduct = async (req, res) => {
             price: req.body.price,
             status: req.body.status,
             shopId: req.body.shopId,
+            quantity: req.body.quantity,
         });
         res.status(200).send({status: true, message: "Product is created."});
     } catch (error) {
@@ -24,6 +25,7 @@ exports.deleteProduct = async (req, res) => {
         });
         if (!isDelete) {
             res.status(404).send({status: false, message: "Product is not found."});
+            return;
         }
         res.status(200).send({status: true, message: "Product is deleted."});
     } catch (error) {
@@ -38,6 +40,7 @@ exports.viewProduct = async (req, res) => {
         });
         if (product == null) {
             res.status(404).send({status: false, message: "Product is not found."});
+            return;
         }
         res.status(200).send({status: true, message: product});
     } catch (error) {
@@ -52,6 +55,7 @@ exports.editProduct = async (req, res) => {
                 name: req.body.name,
                 price: req.body.price,
                 status: req.body.status,
+                quantity: req.body.quantity,
             },{
                 where: {
                 id: req.body.productId
@@ -59,6 +63,7 @@ exports.editProduct = async (req, res) => {
         );
         if (isEdit != 0) {
             res.status(404).send({status: false, message: "Product is not found."});
+            return;
         }
         res.status(200).send({status: true, message: "Product is updated."});
     } catch (error) {

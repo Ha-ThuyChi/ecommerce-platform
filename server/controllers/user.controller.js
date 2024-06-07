@@ -57,7 +57,7 @@ exports.signIn = async (req, res) => {
             res.status(400).send({success: false, message: "Invalid email."});
             return;
         }
-        if (!user.activeStatus) { // Check id account is enable
+        if (user.activeStatus != ("Active")) { // Check id account is enable
             return res.status(400).send({success: false, message: "Account is disable."});
         }
         // Check if password is matched
@@ -85,18 +85,18 @@ exports.signIn = async (req, res) => {
 
 exports.createSellerAccount = async (req, res) => {
     try {
-        let role;
-        try {
-            role = await Role.findOne({where: {name: "Seller"}});  // Find seller role
-        } catch (error) {
-            res.status(500).send({success: false, message: error.message});
-        }
-        await User_role.create({
+        const role = await Role.findOne({where: {name: "Seller"}});  // Find seller role
+        const user = await User_role.create({
             userId: req.body.userId,
             roleId: role.id,
         });
-        res.status(200).send({success: true, message: "Seller account is created."})
+        if (user == 0) {
+            res.status(403).send({success: false, message: "Seller account exist."});
+            return;
+        }
+        res.status(200).send({success: true, message: "Seller account is created."});
     } catch (error) {
         res.status(500).send({success: false, message: error.message});
     };
-}
+};
+
