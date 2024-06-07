@@ -9,8 +9,8 @@ module.exports = (sequelize, Sequelize) => {
             allowNull: false,
         },
         activeStatus: {
-            type: Sequelize.BOOLEAN,
-            defaultValue: true,
+            type: Sequelize.ENUM("Active", "Pending", "Closed"),
+            defaultValue: "Active",
         }
 
     },

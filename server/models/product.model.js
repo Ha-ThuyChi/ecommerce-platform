@@ -1,5 +1,3 @@
-const Shop = require("./shop.model");
-
 module.exports = (sequelize, Sequelize) => {
     const Product = sequelize.define("product", {
         name: {
@@ -14,6 +12,10 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.ENUM("Used", "New"),
             allowNull: false,
         }, 
+        quantity: {
+            type: Sequelize.INTEGER,
+            allowNull: false,
+        },
 
     },
     {

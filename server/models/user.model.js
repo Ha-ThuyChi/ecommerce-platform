@@ -22,8 +22,8 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.STRING,
         },
         activeStatus: {
-            type: Sequelize.BOOLEAN,
-            defaultValue: true,
+            type: Sequelize.ENUM("Active", "Pending", "Closed"),
+            defaultValue: "Active",
         },
     },
     {

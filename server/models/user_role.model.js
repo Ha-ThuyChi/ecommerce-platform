@@ -1,8 +1,8 @@
 module.exports = (sequelize, Sequelize) => {
     const User_role = sequelize.define("user_role", {
         activeStatus: {
-            type: Sequelize.BOOLEAN,
-            defaultValue: true,
+            type: Sequelize.ENUM("Active", "Pending", "Closed"),
+            defaultValue: "Active",
         }
     },
     {
