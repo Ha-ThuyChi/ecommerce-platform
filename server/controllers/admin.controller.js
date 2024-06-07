@@ -1,6 +1,7 @@
 const db = require("../models");
 const User = db.user;
 const Role = db.role;
+const Shop = db.shop;
 const User_role = db.user_role;
 
 const { hashPassword }= require("./hashPassword");
@@ -91,7 +92,11 @@ exports.editStatusSellerAccount = (req, res) => {
         where: { 
             userId: req.body.userId,
         }
-    }).then(() => {
+    }).then((data) => {
+        if (data == 0) {
+            res.status(401).send({success: false, message: "No seller account is valid to edit."});
+            return;
+        };
         res.status(200).send({success: true, message: "Status of seller account is edited."})
     }).catch(error => {
         res.status(500).send({success: false, message: error.message})
@@ -106,10 +111,32 @@ exports.editStatusUserAccount = (req, res) => {
         where: { 
             id: req.body.userId,
         }
-    }).then(() => {
+    }).then((data) => {
+        if (data == 0) {
+            res.status(401).send({success: false, message: "No user account is valid to edit."});
+            return;
+        };
         res.status(200).send({success: true, message: "Status of user account is edited."})
     }).catch(error => {
         res.status(500).send({success: false, message: error.message})
     }) 
 };
 
+// Disable/Enable shop
+exports.editStatusShop = (req, res) => {
+    Shop.update({
+        activeStatus: req.body.activeStatus,
+    }, {
+        where: { 
+            id: req.body.id,
+        }
+    }).then((data) => {
+        if (data == 0) {
+            res.status(401).send({success: false, message: "No shop is valid to edit."});
+            return;
+        };
+        res.status(200).send({success: true, message: "Status of shop is edited."})
+    }).catch(error => {
+        res.status(500).send({success: false, message: error.message})
+    }) 
+};
