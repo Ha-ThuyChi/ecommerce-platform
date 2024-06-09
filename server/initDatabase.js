@@ -64,15 +64,6 @@ async function syncModel() {
     await Role.sync({alert:true, logging: false});
     await User_role.sync({alert:true, logging: false});
 
-    // for testing
-    const pwd = await hashPassword("password");
-    User.create({
-        name: "user2",
-        password: pwd,
-        dob: "01-01-2001",
-        email: "user2@gmail.com"
-    });
-
     // Add roles
     await Role.create({
         name: "Admin",
@@ -83,6 +74,27 @@ async function syncModel() {
     await Role.create({
         name: "Buyer",
     });
+
+    // for testing
+    const pwd = await hashPassword("password");
+    User.create({
+        name: "user1",
+        password: pwd,
+        dob: "01-01-2001",
+        email: "user2@gmail.com"
+    });
+    Shop.create({
+        name: "ChiChi Shop",
+        address: "Hanoi",
+        activeStatus: "Active",
+        userId: 1,
+    });
+    await User_role.create({
+        userId: 1,
+        roleId: 2
+    })
+
+    
 
     console.log("Finish initialize database.")
 }

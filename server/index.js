@@ -8,6 +8,7 @@ const adminRoutes = require("./routes/admin.route");
 const userRoutes = require("./routes/user.route");
 const shopRoutes = require("./routes/shop.route");
 const productRoutes = require("./routes/product.route");
+const promotionRoutes = require("./routes/promotion.route");
 
 syncModel();
 app.use(express.json());
@@ -22,6 +23,7 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/shop", shopRoutes);
 app.use("/api/product", productRoutes);
+app.use("/api/promotion", promotionRoutes);
 
 //connect
 app.listen(2222, () => {
