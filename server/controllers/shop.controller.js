@@ -55,20 +55,20 @@ exports.editShop = async (req, res) => {
    }
 };
 
-exports.requestToCloseShop = async (req, res) => {
+exports.requestToOpenShop = async (req, res) => {
     try {
         const isEdit = await Shop.update({
-            activeStatus: "Pending",
+            activeStatus: "Active",
         },{
         where: {
             id: req.params.shopId,
         }
         });
         if (isEdit != 1) {
-            res.status(404).send({success: false, message: "No shop is closed."});
+            res.status(404).send({success: false, message: "No shop is opened."});
             return;
         };
-        res.status(200).send({success: true, message: "Shop is pending to close."});
+        res.status(200).send({success: true, message: "Shop is pending to open."});
     } catch (error) {
         res.status(500).send({success: false, message: error.message})
     }
@@ -76,12 +76,14 @@ exports.requestToCloseShop = async (req, res) => {
 
 exports.deleteShop = async (req, res) => {
     try {
-        const isDelete = await Shop.destroy({
+        const isDelete = await Shop.update({
+            activeStatus: "Closed",
+        },{
             where: {
                 id: req.params.shopId,
             }
         });
-        if (!isDelete) {
+        if (isDelete != 1) {
             res.status(404).send({status: false, message: "Shop is not found."});
             return;
         }
