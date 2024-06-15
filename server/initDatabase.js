@@ -16,14 +16,81 @@ const Role = db.role;
 const User_role = db.user_role;
 
 // Association
-User.hasMany(Shop);
-User.hasMany(Order);
+User.hasMany(Shop, {
+    foreignKey: {
+        name: "userId",
+        allowNull: false,
+    },
+});
+Shop.belongsTo(User, {
+    foreignKey: {
+        name: "userId",
+        allowNull: false,
+    },
+});
+User.hasMany(Order, {
+    foreignKey: {
+        name: "orderId",
+        allowNull: false,
+    },
+});
+Order.belongsTo(User, {
+    foreignKey: {
+        name: "orderId",
+        allowNull: false,
+    },
+});
 User.hasOne(Cart);
-Shop.hasMany(Product);
-Shop.hasMany(Order);
-
-Cart.belongsToMany(Product, { through: Cart_item });
-Product.belongsToMany(Cart, { through: Cart_item });
+Shop.hasMany(Product, {
+    foreignKey: {
+        name: "shopId",
+        allowNull: false,
+    },
+});
+Product.belongsTo(Shop, {
+    foreignKey: {
+        name: "shopId",
+        allowNull: false,
+    },
+});
+Shop.hasMany(Order, {
+    foreignKey: {
+        name: "shopId",
+        allowNull: false,
+    },
+});
+Order.belongsTo(Shop, {
+    foreignKey: {
+        name: "shopId",
+        allowNull: false,
+    },
+})
+// Cart.belongsToMany(Product, { through: Cart_item });
+// Product.belongsToMany(Cart, { through: Cart_item });
+Cart.hasMany(Cart_item, {
+    foreignKey: {
+        name: "cartId",
+        allowNull: false,
+    },
+});
+Cart_item.belongsTo(Cart, {
+    foreignKey: {
+        name: "cartId",
+        allowNull: false,
+    },
+});
+Product.hasMany(Cart_item, {
+    foreignKey: {
+        name: "productId",
+        allowNull: false,
+    },
+});
+Cart_item.belongsTo(Product, {
+    foreignKey: {
+        name: "cartId",
+        allowNull: false,
+    },
+});
 
 Product.belongsToMany(Property, {through: Product_property});
 Property.belongsToMany(Product, {through: Product_property});
@@ -77,21 +144,48 @@ async function syncModel() {
 
     // for testing
     const pwd = await hashPassword("password");
-    User.create({
+    await User.create({
         name: "user1",
         password: pwd,
         dob: "01-01-2001",
         email: "user2@gmail.com"
     });
-    Shop.create({
+    await Cart.create({
+        userId: 1,
+    });
+    await Shop.create({
         name: "ChiChi Shop",
         address: "Hanoi",
         activeStatus: "Active",
         userId: 1,
     });
+    await Product.create({
+        name: "Manga",
+        price: 100000,
+        quantity: 100,
+        status: "New",
+        shopId: 1,
+    });
+    await Product.create({
+        name: "Figure",
+        price: 200000,
+        quantity: 20,
+        status: "Used",
+        shopId: 1,
+    });
     await User_role.create({
         userId: 1,
         roleId: 2
+    });
+    await Cart_item.create({
+        cartId: 1,
+        productId: 2,
+        quantity: 10
+    });
+    await Cart_item.create({
+        cartId: 1,
+        productId: 1,
+        quantity: 10
     })
 
     
