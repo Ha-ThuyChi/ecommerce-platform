@@ -5,6 +5,9 @@ module.exports = (sequelize, Sequelize) => {
         },
         percentage: {
             type: Sequelize.FLOAT,
+            validate: {
+                min: 1,
+            }
         },
         expireDate: {
             type: Sequelize.DATE,
