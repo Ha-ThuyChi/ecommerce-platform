@@ -9,6 +9,7 @@ const userRoutes = require("./routes/user.route");
 const shopRoutes = require("./routes/shop.route");
 const productRoutes = require("./routes/product.route");
 const promotionRoutes = require("./routes/promotion.route");
+const cartRoutes = require("./routes/cart.route");
 
 syncModel();
 app.use(express.json());
@@ -24,6 +25,7 @@ app.use("/api/user", userRoutes);
 app.use("/api/shop", shopRoutes);
 app.use("/api/product", productRoutes);
 app.use("/api/promotion", promotionRoutes);
+app.use("/api/cart", cartRoutes);
 
 //connect
 app.listen(2222, () => {
