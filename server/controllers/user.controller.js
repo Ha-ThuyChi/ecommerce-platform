@@ -7,6 +7,7 @@ const { hashPassword } = require("./hashPassword");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
+// input: email, password, dob, name, address, phone, role's name
 exports.createUser = async (req, res) => {
     try {
         // Check if input email is existed
@@ -32,7 +33,7 @@ exports.createUser = async (req, res) => {
             phone: req.body.phone
         });
         // Buyer account
-        const role = await Role.findOne({where: {name: "Buyer"}});  // Find buyer role
+        const role = await Role.findOne({where: {name: req.body.role}});  // Find buyer role
         const newUserRole = await User_role.create({
             userId: newUser.id,
             roleId: role.id,
@@ -58,7 +59,7 @@ exports.signIn = async (req, res) => {
         const user = await User.findOne({
             where: {
                 email: req.body.email, 
-            }
+            },
         });
         if (user == null) {
             res.status(400).send({success: false, message: "Invalid email."});
@@ -79,12 +80,23 @@ exports.signIn = async (req, res) => {
             return;
         }
         // Create token
+        const user_roles = await User_role.findAll({
+            where: {
+                userId: user.id,
+                activeStatus: "Active"
+            },
+            include: {
+                model: Role,
+                attributes: ["name"]
+            },
+        });
+        const roles = user_roles.map(r => r.role.name)
         const token = jwt.sign(
-            {user}, 
+            {user, roles}, 
             process.env.JWT_SECRET, 
             // {expiresIn: '1h'}
         );
-        res.status(200).send({success: true, message: {accessToken: token, message: user.id}});
+        res.status(200).send({success: true, message: {accessToken: token, roles: roles, userId: user.id}});
     } catch (error) {
         res.status(500).send({success: false, message: error.message});
     };

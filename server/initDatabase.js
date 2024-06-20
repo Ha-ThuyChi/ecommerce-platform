@@ -30,13 +30,13 @@ Shop.belongsTo(User, {
 });
 User.hasMany(Order, {
     foreignKey: {
-        name: "orderId",
+        name: "userId",
         allowNull: false,
     },
 });
 Order.belongsTo(User, {
     foreignKey: {
-        name: "orderId",
+        name: "userId",
         allowNull: false,
     },
 });
@@ -95,8 +95,30 @@ Cart_item.belongsTo(Product, {
 Product.belongsToMany(Property, {through: Product_property});
 Property.belongsToMany(Product, {through: Product_property});
 
-User.belongsToMany(Role, { through: User_role });
-Role.belongsToMany(User, { through: User_role });
+User.hasMany(User_role, { 
+    foreignKey: {
+        name: "userId",
+        allowNull: false,
+    },
+});
+User_role.belongsTo(User, {
+    foreignKey: {
+        name: "userId",
+        allowNull: false,
+    },
+});
+Role.hasMany(User_role, { 
+    foreignKey: {
+        name: "roleId",
+        allowNull: false,
+    },
+});
+User_role.belongsTo(Role, {
+    foreignKey: {
+        name: "roleId",
+        allowNull: false,
+    },
+});
 
 
 // Connect to database
@@ -148,10 +170,25 @@ async function syncModel() {
         name: "user1",
         password: pwd,
         dob: "01-01-2001",
+        email: "user1@gmail.com"
+    });
+    await User.create({
+        name: "user2",
+        password: pwd,
+        dob: "01-01-2001",
         email: "user2@gmail.com"
+    });
+    await User.create({
+        name: "user3",
+        password: pwd,
+        dob: "01-01-2001",
+        email: "user3@gmail.com"
     });
     await Cart.create({
         userId: 1,
+    });
+    await Cart.create({
+        userId: 2,
     });
     await Shop.create({
         name: "ChiChi Shop",
@@ -173,9 +210,32 @@ async function syncModel() {
         status: "Used",
         shopId: 1,
     });
+    // user1: Admin
+    // user2: Buyer, Seller
+    // user3: Buyer, Seller, Admin
     await User_role.create({
         userId: 1,
+        roleId: 1
+    });
+    // await User_role.create({
+    //     userId: 2,
+    //     roleId: 2
+    // });
+    await User_role.create({
+        userId: 2,
+        roleId: 3
+    });
+    await User_role.create({
+        userId: 3,
         roleId: 2
+    });
+    await User_role.create({
+        userId: 3,
+        roleId: 1
+    });
+    await User_role.create({
+        userId: 3,
+        roleId: 3
     });
     await Cart_item.create({
         cartId: 1,

@@ -19,6 +19,10 @@ module.exports = (sequelize, Sequelize) => {
                 min: 0,
             }
         },
+        description: {
+            type: Sequelize.TEXT,
+            defaultValue: "Description"
+        }
 
     },
     {

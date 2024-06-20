@@ -103,7 +103,7 @@ exports.viewCart = async (req, res) => {
             },
             include: {
                 model: Product,
-                attributes: ["name", "price", "status"],
+                attributes: ["name", "price", "status", "description"],
                 include: {
                     model: Shop,
                     attributes: ['name']

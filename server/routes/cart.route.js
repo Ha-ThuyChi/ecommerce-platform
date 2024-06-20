@@ -1,9 +1,10 @@
 const controller = require("../controllers/cart.controller");
 const express = require("express");
 const router = express.Router();
-const authenticateToken = require("./authenticate.route");
+const { authenticateToken, authorizeUser } = require("./authenticate.route");
 
 router.use(authenticateToken);
+router.use(authorizeUser(["Buyer"]));
 
 router.post("/add-item", controller.addItemToCart);
 router.delete("/delete-item", controller.deleteItemFromCart);

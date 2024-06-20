@@ -7,6 +7,10 @@ module.exports = (sequelize, Sequelize) => {
                 min: 0,
             }
         },
+        isFavourite: {
+            type: Sequelize.BOOLEAN,
+            defaultValue: false
+        }
     },
     {
         tableName: "cart_items", 
