@@ -24,7 +24,6 @@ const authenticateToken = (req, res, next) => {
 
 const authorizeUser = (roles) => {
   return (req, res, next) => {
-    console.log(req.params)
     if (roles.length && !req.user.roles.some(r => roles.includes(r))) {
         // user's role is not authorized
         return res.status(401).json({ message: 'Unauthorized' });

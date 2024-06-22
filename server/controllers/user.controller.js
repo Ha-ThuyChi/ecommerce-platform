@@ -17,7 +17,7 @@ exports.createUser = async (req, res) => {
             }
         });
         if (email) {
-            res.status(409).send({success: false, message: "email is existed."})
+            res.status(409).send({success: false, message: "Email is existed."})
             return;
         };
         // Email is valid to create new user account, buyer account and cart

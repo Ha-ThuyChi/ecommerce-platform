@@ -4,7 +4,7 @@ const router = express.Router();
 const { authenticateToken, authorizeUser } = require("./authenticate.route");
 
 // Sign in, Sign up for user (Admin, Buyer, Seller)
-router.get("/sign-in", controller.signIn);
+router.post("/sign-in", controller.signIn);
 router.post("/create-user", controller.createUser);
 
 router.use(authenticateToken);

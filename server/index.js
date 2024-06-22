@@ -12,8 +12,9 @@ const promotionRoutes = require("./routes/promotion.route");
 const cartRoutes = require("./routes/cart.route");
 const orderRoutes = require("./routes/order.route");
 
-syncModel();
+
 app.use(express.json());
+syncModel();
 
 //middleware 
 app.use(bodyParser.json());
