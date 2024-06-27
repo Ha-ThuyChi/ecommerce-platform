@@ -1,5 +1,6 @@
 const db = require("../models");
 const Product = db.product;
+const Shop = db.shop;
 
 exports.createProduct = async (req, res) => {
     try {
@@ -70,3 +71,30 @@ exports.editProduct = async (req, res) => {
         res.status(500).send({success: false, message: error.message});
     };
 };
+
+exports.getSomeProducts = async (req, res) => {
+    try {
+        const listProducts = await Product.findAll({
+            order: [
+                ["createdAt", "ASC"]
+            ],
+            offset: (req.params.pageNum - 1) * 5,
+            limit: 5,
+            include: {
+                model: Shop,
+                attributes: ["name"]
+            }
+        });
+        if (listProducts == null) {
+            res.status(404).send({status: false, message: "No product is found."});
+            return;
+        }
+        res.status(200).send({status: true, message: listProducts});
+    } catch (error) {
+        res.status(500).send({success: false, message: error.message});
+    }
+};
+
+// exports.updateSold = async (req, res) => {
+
+// }
