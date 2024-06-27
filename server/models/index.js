@@ -25,5 +25,6 @@ db.product_property = require("./product_property.model.js")(sequelize, Sequeliz
 db.user = require("./user.model.js")(sequelize, Sequelize);
 db.role = require("./role.model.js")(sequelize, Sequelize);
 db.user_role = require("./user_role.model.js")(sequelize, Sequelize);
+db.order_item = require("./order_item.model.js")(sequelize, Sequelize);
 
 module.exports = db;
