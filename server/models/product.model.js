@@ -22,8 +22,14 @@ module.exports = (sequelize, Sequelize) => {
         description: {
             type: Sequelize.TEXT,
             defaultValue: "Description"
+        },
+        image: {
+            type: Sequelize.STRING
+        },
+        sold: {
+            type: Sequelize.INTEGER,
+            defaultValue: 0
         }
-
     },
     {
         tableName: "products", 

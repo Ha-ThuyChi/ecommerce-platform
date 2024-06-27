@@ -5,7 +5,6 @@ const Order_item = require("../models").order_item;
 // input: userId, shopId, total, shipto, orderItems[quantity, productId]
 exports.createOrder = async (req, res) => {
     try {
-        // Calculate the total of the order and check if the requested quantity is valid
         let total = 0;
         const orderItems = req.body.orderItems;
         for (const orderItem of orderItems) {
@@ -13,12 +12,20 @@ exports.createOrder = async (req, res) => {
                 where: {id: orderItem.productId},
                 attributes: ["price", "quantity", "name"]
             });
-            
+            // Calculate the total of the order
+            total = total + (item.price*orderItem.quantity);
+            // Check if requested quantity is valid
             if (orderItem.quantity > item.quantity) {
                 res.status(400).send({success: true, message:  `Available stock of ${item.name} is less than the requested quantity.`});
                 return;
-            }
-            total = total + (item.price*orderItem.quantity);
+            };
+            // Decrease the quantity of product
+            await Product.decrement("quantity", {
+                by: orderItem.quantity,
+                where: {
+                    id: orderItem.productId
+                }
+            });
         };
         // Create a new order
         const newOrder = await Order.create({
@@ -75,13 +82,7 @@ exports.updateStatus = async (req, res) => {
                         id: item.productId
                     }
                 });
-                await Product.decrement("quantity", {
-                    by: orderItem.quantity,
-                    where: {
-                        id: item.productId
-                    }
-                });
-            })
+            });
         };
         console.log(isUpdated)
         const isUpdateStatus = await Order.update({

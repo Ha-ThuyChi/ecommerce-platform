@@ -14,6 +14,7 @@ const Product_property = db.product_property;
 const User = db.user;
 const Role = db.role;
 const User_role = db.user_role;
+const Order_item = db.order_item;
 
 // Association
 User.hasMany(Shop, {
@@ -92,6 +93,31 @@ Cart_item.belongsTo(Product, {
     },
 });
 
+Order.hasMany(Order_item, {
+    foreignKey: {
+        name: "orderId",
+        allowNull: false,
+    },
+});
+Order_item.belongsTo(Order, {
+    foreignKey: {
+        name: "orderId",
+        allowNull: false,
+    },
+});
+Product.hasMany(Order_item, {
+    foreignKey: {
+        name: "productId",
+        allowNull: false,
+    },
+});
+Order_item.belongsTo(Product, {
+    foreignKey: {
+        name: "productId",
+        allowNull: false,
+    },
+});
+
 Product.belongsToMany(Property, {through: Product_property});
 Property.belongsToMany(Product, {through: Product_property});
 
@@ -152,6 +178,7 @@ async function syncModel() {
     await Product_property.sync({alert:true, logging: false});
     await Role.sync({alert:true, logging: false});
     await User_role.sync({alert:true, logging: false});
+    await Order_item.sync({alert:true, logging: false});
 
     // Add roles
     await Role.create({
@@ -202,25 +229,77 @@ async function syncModel() {
         quantity: 100,
         status: "New",
         shopId: 1,
+        createdAt: "2023-01-01",
+        image: "https://th.bing.com/th/id/R.c38fe4763f73923ab3a9beb5cc2af370?rik=KlXLLrBiBwl87w&pid=ImgRaw&r=0"
     });
     await Product.create({
-        name: "Figure",
+        name: "Figure1",
         price: 200000,
         quantity: 20,
         status: "Used",
         shopId: 1,
+        createdAt: "2022-01-01",
+        image: "https://th.bing.com/th/id/R.c38fe4763f73923ab3a9beb5cc2af370?rik=KlXLLrBiBwl87w&pid=ImgRaw&r=0"
     });
+    await Product.bulkCreate([
+        {
+            name: "Figure2",
+            price: 200000,
+            quantity: 20,
+            status: "Used",
+            shopId: 1,
+            createdAt: "2021-01-01",
+            image: "https://th.bing.com/th/id/R.c38fe4763f73923ab3a9beb5cc2af370?rik=KlXLLrBiBwl87w&pid=ImgRaw&r=0"
+        },
+        {
+            name: "Figure3",
+            price: 200000,
+            quantity: 20,
+            status: "Used",
+            shopId: 1,
+            createdAt: "2010-01-01",
+            image: "https://th.bing.com/th/id/R.c38fe4763f73923ab3a9beb5cc2af370?rik=KlXLLrBiBwl87w&pid=ImgRaw&r=0"
+        },
+        {
+            name: "Figure4",
+            price: 200000,
+            quantity: 20,
+            status: "Used",
+            shopId: 1,
+            image: "https://th.bing.com/th/id/R.c38fe4763f73923ab3a9beb5cc2af370?rik=KlXLLrBiBwl87w&pid=ImgRaw&r=0"
+        },
+        {
+            name: "Figure5",
+            price: 200000,
+            quantity: 20,
+            status: "Used",
+            shopId: 1,
+            image: "https://th.bing.com/th/id/R.c38fe4763f73923ab3a9beb5cc2af370?rik=KlXLLrBiBwl87w&pid=ImgRaw&r=0"
+        },
+        {
+            name: "Figure6",
+            price: 200000,
+            quantity: 20,
+            status: "Used",
+            shopId: 1,
+            image: "https://th.bing.com/th/id/R.c38fe4763f73923ab3a9beb5cc2af370?rik=KlXLLrBiBwl87w&pid=ImgRaw&r=0"
+        },
+        {
+            name: "Figure7",
+            price: 200000,
+            quantity: 20,
+            status: "Used",
+            shopId: 1,
+            image: "https://th.bing.com/th/id/R.c38fe4763f73923ab3a9beb5cc2af370?rik=KlXLLrBiBwl87w&pid=ImgRaw&r=0"
+        }
+    ]);
     // user1: Admin
-    // user2: Buyer, Seller
-    // user3: Buyer, Seller, Admin
+    // user2: Buyer
+    // user3: Buyer, Seller
     await User_role.create({
         userId: 1,
         roleId: 1
     });
-    // await User_role.create({
-    //     userId: 2,
-    //     roleId: 2
-    // });
     await User_role.create({
         userId: 2,
         roleId: 3
@@ -228,10 +307,6 @@ async function syncModel() {
     await User_role.create({
         userId: 3,
         roleId: 2
-    });
-    await User_role.create({
-        userId: 3,
-        roleId: 1
     });
     await User_role.create({
         userId: 3,
@@ -246,7 +321,23 @@ async function syncModel() {
         cartId: 1,
         productId: 1,
         quantity: 10
-    })
+    });
+    // await Order.create({
+    //     shipTo: "address1",
+    //     total: 1500000,
+    //     userId: 2,
+    //     shopId: 1
+    // });
+    // await Order_item.create({
+    //     quantity: 5,
+    //     orderId: 1,
+    //     productId: 1
+    // });
+    // await Order_item.create({
+    //     quantity: 5,
+    //     orderId: 1,
+    //     productId: 2
+    // })
 
     
 
