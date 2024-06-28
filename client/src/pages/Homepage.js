@@ -6,9 +6,6 @@ async function fetchProducts(pageNum, setProducts, token) {
     try {
         const response = await fetch(config.serverLink + `/api/product/get-products/${pageNum}`, {
             method: "GET",
-            headers: {
-                "Authorization": `Bearer ${token}`
-            }
         });
         if (!response.ok) {
             console.error("error:", response.status);

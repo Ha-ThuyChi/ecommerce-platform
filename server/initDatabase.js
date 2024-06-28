@@ -212,10 +212,7 @@ async function syncModel() {
         email: "user3@gmail.com"
     });
     await Cart.create({
-        userId: 1,
-    });
-    await Cart.create({
-        userId: 2,
+        userId: 3,
     });
     await Shop.create({
         name: "ChiChi Shop",

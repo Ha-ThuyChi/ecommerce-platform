@@ -3,9 +3,10 @@ const express = require("express");
 const router = express.Router();
 const { authenticateToken, authorizeUser } = require("./authenticate.route");
 
+router.get("/get-products/:pageNum",controller.getSomeProducts);
+
 router.use(authenticateToken);
 
-router.get("/get-products/:pageNum",controller.getSomeProducts);
 router.get("/view-product/:productId", controller.viewProduct);
 
 router.use(authorizeUser(["Seller"]));

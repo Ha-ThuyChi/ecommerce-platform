@@ -30,7 +30,8 @@ export function NavBar() {
             ) : (
                 <>
                     <NavLink className={"nav-link"} to={"/"}>Homepage</NavLink>
-                    <NavLink className={"nav-link"} to={"/view-my-profile"}>My Profile</NavLink>
+                    <NavLink className={"nav-link"} to={"/view-profile"}>My Profile</NavLink>
+                    <NavLink className={"nav-link"} to={"/view-cart"}>My Cart</NavLink>
                     <button onClick={handleSignout}>Sign out</button><br/> 
                 </>
             )

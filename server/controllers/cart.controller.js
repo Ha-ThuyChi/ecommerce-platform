@@ -1,5 +1,6 @@
 const db = require("../models");
 const Cart_item = db.cart_item;
+const Cart = db.cart;
 const Product = db.product;
 const Shop = db.shop;
 
@@ -97,9 +98,12 @@ exports.decreaseItemInCart = async (req, res) => {
 
 exports.viewCart = async (req, res) => {
     try {
+        const cartId = await Cart.findOne({
+            where: {userId: req.params.userId}
+        });
         const items = await Cart_item.findAll({
             where: {
-                cartId: req.params.cartId,
+                cartId: cartId.id,
             },
             include: {
                 model: Product,
