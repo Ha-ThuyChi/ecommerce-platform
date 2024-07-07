@@ -4,12 +4,17 @@ const Cart = db.cart;
 const Product = db.product;
 const Shop = db.shop;
 
+// input: userId, productId, quanitty
 exports.addItemToCart = async (req, res) => {
     try {
-        const cartId = req.body.cartId;
+        const userId = req.body.userId;
         const productId = req.body.productId;
         const quantity = req.body.quantity;
-
+        const cart = await Cart.findOne({
+            where: {userId: userId}
+        });
+        const cartId = cart.id;
+        console.log(cartId)
         // Chech if input quantity is larger than the avai quantity
         const instockProduct = await Product.findOne({
             where: {
@@ -32,7 +37,7 @@ exports.addItemToCart = async (req, res) => {
         if (isExist == null) {
             // If not create new Cart_item
             isAdd = await Cart_item.create({
-                cartId: req.body.cartId,
+                cartId: cartId,
                 productId: productId,
                 quantity: quantity
             });
@@ -98,19 +103,19 @@ exports.decreaseItemInCart = async (req, res) => {
 
 exports.viewCart = async (req, res) => {
     try {
-        const cartId = await Cart.findOne({
+        const cart = await Cart.findOne({
             where: {userId: req.params.userId}
         });
         const items = await Cart_item.findAll({
             where: {
-                cartId: cartId.id,
+                cartId: cart.id,
             },
             include: {
                 model: Product,
-                attributes: ["name", "price", "status", "description"],
+                attributes: ["name", "price", "status", "description", "id"],
                 include: {
                     model: Shop,
-                    attributes: ['name']
+                    attributes: ['name', "id"]
                 }
             }
         });
