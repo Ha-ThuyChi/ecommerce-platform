@@ -88,7 +88,7 @@ Product.hasMany(Cart_item, {
 });
 Cart_item.belongsTo(Product, {
     foreignKey: {
-        name: "cartId",
+        name: "productId",
         allowNull: false,
     },
 });
@@ -211,21 +211,24 @@ async function syncModel() {
         dob: "01-01-2001",
         email: "user3@gmail.com"
     });
-    await Cart.create({
-        userId: 3,
-    });
     await Shop.create({
         name: "ChiChi Shop",
         address: "Hanoi",
         activeStatus: "Active",
-        userId: 1,
+        userId: 3,
+    });
+    await Shop.create({
+        name: "Shop Shop",
+        address: "Hanoi",
+        activeStatus: "Active",
+        userId: 3,
     });
     await Product.create({
         name: "Manga",
         price: 100000,
         quantity: 100,
         status: "New",
-        shopId: 1,
+        shopId: 2,
         createdAt: "2023-01-01",
         image: "https://th.bing.com/th/id/R.c38fe4763f73923ab3a9beb5cc2af370?rik=KlXLLrBiBwl87w&pid=ImgRaw&r=0"
     });
@@ -309,6 +312,12 @@ async function syncModel() {
         userId: 3,
         roleId: 3
     });
+    await Cart.create({
+        userId: 3,
+    });
+    await Cart.create({
+        userId: 2,
+    });
     await Cart_item.create({
         cartId: 1,
         productId: 2,
@@ -317,6 +326,11 @@ async function syncModel() {
     await Cart_item.create({
         cartId: 1,
         productId: 1,
+        quantity: 10
+    });
+    await Cart_item.create({
+        cartId: 2,
+        productId: 2,
         quantity: 10
     });
     // await Order.create({

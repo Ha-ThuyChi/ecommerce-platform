@@ -2,52 +2,81 @@ const Order = require("../models").order;
 const Product = require("../models").product;
 const Order_item = require("../models").order_item;
 
-// input: userId, shopId, total, shipto, orderItems[quantity, productId]
+
+async function restuctureOrderItems(items) {
+    try {
+        let newOrderItems = [];
+        for (const item of items) {
+            const product = await Product.findOne({where:{id: item.productId}, attributes: ["shopId"]});
+            const order = newOrderItems.find(order => order.shopId == product.shopId);
+            if (order) {
+                order.items.push(item);
+            } else {
+                console.log(item)
+                newOrderItems.push({shopId: product.shopId, items: [item]});
+            }
+        };
+        return newOrderItems;
+    } catch (error) {
+       console.error(`Error while restructuring the order items: ${error.message}`);
+    }
+}
+
+// input: userId, shipto, orderItems[{productId: 1, quantity: 1},...]
 exports.createOrder = async (req, res) => {
     try {
         let total = 0;
-        const orderItems = req.body.orderItems;
+        let newOrders = [], index = 0;
+        const items = req.body.orderItems
+        const orderItems = await restuctureOrderItems(items);
         for (const orderItem of orderItems) {
-            const item = await Product.findOne({
-                where: {id: orderItem.productId},
-                attributes: ["price", "quantity", "name"]
-            });
-            // Calculate the total of the order
-            total = total + (item.price*orderItem.quantity);
-            // Check if requested quantity is valid
-            if (orderItem.quantity > item.quantity) {
-                res.status(400).send({success: true, message:  `Available stock of ${item.name} is less than the requested quantity.`});
-                return;
-            };
+            console.log(orderItem)
             // Decrease the quantity of product
-            await Product.decrement("quantity", {
-                by: orderItem.quantity,
-                where: {
-                    id: orderItem.productId
-                }
+            const items = orderItem.items;
+            for (const item of items) {
+                const product = await Product.findOne({
+                    where: {id: item.productId},
+                    attributes: ["price", "quantity", "name", "shopId"]
+                });
+                // Check if requested quantity is valid
+                if (item.quantity > product.quantity) {
+                    res.status(400).send({success: false, message: `Quantity of item ${product.name} is not valid.`});
+                    return;
+                };
+
+                // Calculate the total of the order
+                total = total + (product.price*item.quantity);
+                // Decrease quantity of product in the stock
+                await Product.decrement("quantity", {
+                    by: item.quantity,
+                    where: {
+                        id: item.productId
+                    }
+                });
+            };
+            // Create a new order
+            newOrders[index] = await Order.create({
+                status: "Packing",
+                shipTo: req.body.shipTo,
+                total: total,
+                userId: req.body.userId,
+                shopId: orderItem.shopId,
             });
-        };
-        // Create a new order
-        const newOrder = await Order.create({
-            status: "Packing",
-            shipTo: req.body.shipTo,
-            total: total,
-            userId: req.body.userId,
-            shopId: req.body.shopId,
-        });
-        // Create new order_item to save the items in the cart
-        const newOrderItem = orderItems.map(async (item) => 
-            await Order_item.create({
-                quantity: item.quantity,
-                orderId: newOrder.id,
-                productId: item.productId
+            for (const item of items) {
+                await Order_item.create({
+                    quantity: item.quantity,
+                    orderId: newOrders[index].id,
+                    productId: item.productId
+                });
             }
-        ));
-        if (newOrder && newOrderItem) {
+            index++;
+        };
+        if (newOrders) {
             res.status(200).send({success: true, message: "Order is created."});
         } else {
-            res.status(400).send({success: true, message: "Fail to create a new order."});
-        }
+            res.status(400).send({success: true, message: `Fail to create a new order.}`});
+            return;
+        };
     } catch (error) {
         res.status(500).send({success: false, message: error.message});
     }
