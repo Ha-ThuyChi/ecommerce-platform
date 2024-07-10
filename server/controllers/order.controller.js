@@ -1,6 +1,9 @@
-const Order = require("../models").order;
-const Product = require("../models").product;
-const Order_item = require("../models").order_item;
+const db = require("../models");
+const Order = db.order;
+const Product = db.product;
+const Order_item = db.order_item;
+const Cart_item = db.cart_item;
+const Cart = db.cart;
 
 
 async function restuctureOrderItems(items) {
@@ -29,6 +32,8 @@ exports.createOrder = async (req, res) => {
         let newOrders = [], index = 0;
         const items = req.body.orderItems
         const orderItems = await restuctureOrderItems(items);
+        const cart = await Cart.findOne({where: {userId: req.body.userId}})
+        console.log(items)
         for (const orderItem of orderItems) {
             console.log(orderItem)
             // Decrease the quantity of product
@@ -67,6 +72,12 @@ exports.createOrder = async (req, res) => {
                     quantity: item.quantity,
                     orderId: newOrders[index].id,
                     productId: item.productId
+                });
+                await Cart_item.destroy({
+                    where: {
+                        productId: item.productId,
+                        cartId: cart.id,
+                    }
                 });
             }
             index++;

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { NavBar } from "../components/NavBar";
 import config from "../config";
-import Popup from "reactjs-popup";
+import Modal from "react-modal";
 
 async function fetchProducts(pageNum, setProducts) {
     try {
@@ -19,7 +19,6 @@ async function fetchProducts(pageNum, setProducts) {
 };
 
 async function addItemToCart(token, values) {
-    console.log("create order")
     try {
         const response = await fetch(config.serverLink + `/api/cart/add-item`, {
             method: "POST",
@@ -30,7 +29,6 @@ async function addItemToCart(token, values) {
             body: JSON.stringify(values)
         });
         const result = await response.json();
-        console.log(result)
         return result;
     } catch (error) {
         console.error("Error while fetching user: ", error.message);
@@ -41,18 +39,26 @@ export function Homepage() {
     const token = localStorage.getItem("token");
     const [products, setProducts] = useState([]);
     const [pageNum, setPageNum] = useState(1);
-    const [showAddToCart, setShowAddToCart] = useState(false);
     const [quantity, setQuantity] = useState(1);
-    const userId = localStorage.getItem("userId")
+    const userId = localStorage.getItem("userId");
+    const [modelIsOpen, setModalIsOpen] = useState(false);
+    const [selectedProduct, setSelectedProduct] = useState(null);
+
+    const customStyles = {
+        content: {
+            top: '50%',
+            left: '50%',
+            right: 'auto',
+            bottom: 'auto',
+            marginRight: '-50%',
+            transform: 'translate(-50%, -50%)',
+        },
+    };
 
     useEffect(() => {
         fetchProducts(pageNum, setProducts, token)
     }, [pageNum, token]);
 
-    async function handleShowAddToCart(e) {
-        e.preventDefault();
-        setShowAddToCart(true);
-    };
     async function handleAddToCart(e, productId) {
         e.preventDefault();
         const response = await addItemToCart(token, {
@@ -60,12 +66,20 @@ export function Homepage() {
             productId,
             quantity
         });
-        console.log(response)
         if (response.success) {
             alert(response.message);
+            window.location.href = "/view-cart"
         } else {
             alert(`${response.message}`);
         }
+    };
+    function openModal(product) {
+        setSelectedProduct(product);
+        setModalIsOpen(true);
+    };
+    function closeModal() {
+        setModalIsOpen(false);
+        setSelectedProduct(null);
     };
     return (
         <div>
@@ -78,20 +92,18 @@ export function Homepage() {
                             <ul>
                                 <li>Name: {product.name}</li>
                                 <li>Image:<br/>
-                                    <img src={product.image} alt="Image" width={500}/>
+                                    <img src={product.image} alt={`${product.name}`} width={500}/>
                                 </li>
                                 <li>Description: {product.description}</li>
                                 <li>Price: {product.price}</li>
                                 <li>Status: {product.status}</li>
+                                <li>Available stock: {product.quantity}</li>
                                 <li>Shop: {product.shop.name}</li>
-                                <button onClick={handleShowAddToCart}>Add to cart</button>
-                                {showAddToCart && 
-                                    <div>
-                                        <label htmlFor="quantity">Quantity:</label><br/>
-                                        <input type="number" name="quantity" value={quantity} min={1} onChange={e => setQuantity(e.target.value)}></input><br/>
-                                        <button onClick={e => handleAddToCart(e, product.id)}>Add</button>
-                                    </div>
-                                }
+                                {product.quantity > 0 ? (
+                                    <button onClick={() => openModal(product)}>Add to cart</button>
+                                ) : (
+                                    <button onClick={() => openModal(product)} disabled>Add to cart</button>
+                                )}
                             </ul>
                         </div>
                     )
@@ -101,7 +113,20 @@ export function Homepage() {
             )}
             <label htmlFor="page">Page: </label>
             <input type="number" name="page" value={pageNum} onChange={e => setPageNum(e.target.value)}></input>
-            
+            {selectedProduct !== null && 
+                <Modal 
+                    isOpen={modelIsOpen} 
+                    onRequestClose={closeModal}
+                    style={customStyles}
+                    ariaHideApp={false}
+                >
+                    <p>Name: {selectedProduct.name}</p>
+                    <p>Price: {selectedProduct.price}</p>
+                    <label htmlFor="quantity">Quantity:</label><br/>
+                    <input type="number" name="quantity" value={quantity} min={1} onChange={e => setQuantity(e.target.value)}></input><br/>
+                    <button onClick={e => handleAddToCart(e, selectedProduct.id)}>Add</button>
+                </Modal>
+            }
         </div>
     )
 }

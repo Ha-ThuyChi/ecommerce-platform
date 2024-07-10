@@ -47,7 +47,6 @@ export function ViewCart() {
     const [shipTo, setShipTo] = useState("");
     const userId = localStorage.getItem("userId");
     const token = localStorage.getItem("token");
-    const [isSelect, setIsSelect] = useState(false);
     let orderItems = [];
 
     useEffect(() => {
@@ -74,6 +73,8 @@ export function ViewCart() {
         console.log(response)
         if (response.success) {
             alert(response.message);
+            
+            window.location.reload();
         } else {
             alert(`${response.message}`);
         }
@@ -82,17 +83,21 @@ export function ViewCart() {
         <div>
             <NavBar/>
             <h1>My Cart</h1>
-            {cart !== null && token !== null ? (
+            {cart !== null && cart.length > 0 ? (
                 cart.map((item) => {
+                    console.log(item)
                     return (
                         <div>
                             <input 
                                 type="checkbox" 
-                                id={item.id} value={item.id}
+                                id={item.id} value={item.product.id}
                                 onChange={(e) => handleCheck(e, item.quantity)}/>
                             <label htmlFor={item.id}>
                                 <ul>
                                     <li>Product's name: {item.product.name}</li>
+                                    <li>Image:<br/>
+                                        <img src={item.product.image} alt={`${item.product.name}`} width={500}/>
+                                    </li>
                                     <li>Description: {item.product.description}</li>
                                     <li>Price: {item.product.price}</li>
                                     <li>Quantity: {item.quantity}</li>
@@ -106,7 +111,7 @@ export function ViewCart() {
                 })
             ) : (
                 <div>
-                    You need to <Link to={"/sign-in"}>Sign in</Link> or <Link to={"/sign-up"}>Sign up</Link> to use this website.
+                    Your cart is currently empty. Shopping now? <Link to={"/"}>Add more product.</Link>
                 </div>
             )}
             

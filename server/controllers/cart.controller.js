@@ -14,7 +14,15 @@ exports.addItemToCart = async (req, res) => {
             where: {userId: userId}
         });
         const cartId = cart.id;
-        console.log(cartId)
+        console.log(cartId);
+        // Check if item exist in the cart
+        const cartItem = await Cart_item.findOne({
+            where: {
+                cartId: cartId,
+                productId: productId,
+            }
+        });
+        console.log(cartItem)
         // Chech if input quantity is larger than the avai quantity
         const instockProduct = await Product.findOne({
             where: {
@@ -23,18 +31,11 @@ exports.addItemToCart = async (req, res) => {
             attributes: ['quantity']
         });
         if (quantity > instockProduct.quantity) {
-            res.status(400).send({success: true, message: "Available stock is less than the requested quantity."});
+            res.status(400).send({success: false, message: "Available stock is less than the requested quantity."});
             return;
         };
-        // Check if item exist in the cart
-        const isExist = await Cart_item.findOne({
-            where: {
-                cartId: cartId,
-                productId: productId,
-            }
-        });
         let isAdd;
-        if (isExist == null) {
+        if (cartItem == null) {
             // If not create new Cart_item
             isAdd = await Cart_item.create({
                 cartId: cartId,
@@ -42,7 +43,11 @@ exports.addItemToCart = async (req, res) => {
                 quantity: quantity
             });
         } else {
-            // If yes, increase the quantity
+            // If yes, check the new quantity then increase the quantity
+            if (quantity + cartItem.quantity > instockProduct.quantity) {
+                res.status(400).send({success: false, message: "Available stock is less than your requested quantity and quantity in the cart."});
+                return;
+            }
             isAdd = await Cart_item.increment("quantity", {
                 by: quantity,
                 where: {
@@ -112,7 +117,7 @@ exports.viewCart = async (req, res) => {
             },
             include: {
                 model: Product,
-                attributes: ["name", "price", "status", "description", "id"],
+                attributes: ["name", "price", "status", "description", "id", "image"],
                 include: {
                     model: Shop,
                     attributes: ['name', "id"]

@@ -239,7 +239,7 @@ async function syncModel() {
         status: "Used",
         shopId: 1,
         createdAt: "2022-01-01",
-        image: "https://th.bing.com/th/id/R.c38fe4763f73923ab3a9beb5cc2af370?rik=KlXLLrBiBwl87w&pid=ImgRaw&r=0"
+        image: "https://images3.alphacoders.com/130/thumb-1920-1301315.jpg"
     });
     await Product.bulkCreate([
         {
@@ -328,11 +328,11 @@ async function syncModel() {
         productId: 1,
         quantity: 10
     });
-    await Cart_item.create({
-        cartId: 2,
-        productId: 2,
-        quantity: 10
-    });
+    // await Cart_item.create({
+    //     cartId: 2,
+    //     productId: 2,
+    //     quantity: 10
+    // });
     // await Order.create({
     //     shipTo: "address1",
     //     total: 1500000,
