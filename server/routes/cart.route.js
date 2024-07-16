@@ -8,7 +8,7 @@ router.use(authorizeUser(["Buyer"]));
 
 router.post("/add-item", controller.addItemToCart);
 router.delete("/delete-item", controller.deleteItemFromCart);
-router.put("/decrease-quantity", controller.decreaseItemInCart)
+router.put("/update-quantity", controller.updateQuantity)
 router.get("/view-cart/:userId", controller.viewCart);
 
 module.exports = router;

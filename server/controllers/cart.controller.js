@@ -44,7 +44,7 @@ exports.addItemToCart = async (req, res) => {
             });
         } else {
             // If yes, check the new quantity then increase the quantity
-            if (quantity + cartItem.quantity > instockProduct.quantity) {
+            if (Number(quantity) + cartItem.quantity > instockProduct.quantity) {
                 res.status(400).send({success: false, message: "Available stock is less than your requested quantity and quantity in the cart."});
                 return;
             }
@@ -87,19 +87,32 @@ exports.deleteItemFromCart = async (req, res) => {
     }
 };
 
-exports.decreaseItemInCart = async (req, res) => {
+// input: productId, cartId, action
+exports.updateQuantity = async (req, res) => {
     try {
-        const [isDecrease] = await Cart_item.decrement("quantity", {
-            by: 1,
-            where: {
-                productId: req.body.productId,
-                cartId: req.body.cartId
-            }
-        });
-        if (isDecrease[1] == 1) {
-            res.status(200).send({success: true, message: "1 item is removed from cart."});
+        const action = req.body.action;
+        let isUpdated;
+        if (action === "decrease") {
+            [isUpdated] = await Cart_item.decrement("quantity", {
+                by: 1,
+                where: {
+                    productId: req.body.productId,
+                    cartId: req.body.cartId
+                }
+            });
         } else {
-            res.status(400).send({success: true, message: "Fail to remove 1 item from cart."});
+            [isUpdated] = await Cart_item.increment("quantity", {
+                by: 1,
+                where: {
+                    productId: req.body.productId,
+                    cartId: req.body.cartId
+                }
+            });
+        };
+        if (isUpdated[1] == 1) {
+            res.status(200).send({success: true, message: "Quantity is updated."});
+        } else {
+            res.status(400).send({success: true, message: "Fail to update the quantity in the cart."});
         }
     } catch (error) {
         res.status(500).send({success: false, message: error.message});

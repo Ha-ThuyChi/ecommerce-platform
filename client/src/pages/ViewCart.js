@@ -24,10 +24,27 @@ async function fetchCart(userId, token, setCart) {
 }
 
 async function createOrder(token, values) {
-    console.log("create order")
     try {
         const response = await fetch(config.serverLink + `/api/order/create-order`, {
             method: "POST",
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type" : "application/json"
+            },
+            body: JSON.stringify(values)
+        });
+        const result = await response.json();
+        console.log(result)
+        return result;
+    } catch (error) {
+        console.error("Error while fetching user: ", error.message);
+    }
+};
+
+async function updateQuantity(token, values) {
+    try {
+        const response = await fetch(config.serverLink + `/api/cart/update-quantity`, {
+            method: "PUT",
             headers: {
                 "Authorization": `Bearer ${token}`,
                 "Content-Type" : "application/json"
@@ -70,7 +87,6 @@ export function ViewCart() {
             shipTo,
             orderItems,
         });
-        console.log(response)
         if (response.success) {
             alert(response.message);
             
@@ -78,7 +94,27 @@ export function ViewCart() {
         } else {
             alert(`${response.message}`);
         }
-    }
+    };
+    // input: userId, shipto, orderItems
+    async function handleUpdate(e, productId, cartId) {
+        e.preventDefault();
+        let action;
+        if (e.target.textContent === "+") {
+            action = "increase"
+        } else {
+            action = "decrease"
+        };
+        const response = await updateQuantity(token, {
+            productId,
+            cartId,
+            action
+        });
+        if (response.success) {
+            window.location.reload();
+        } else {
+            alert(`${response.message}`);
+        }
+    };
     return(
         <div>
             <NavBar/>
@@ -100,10 +136,10 @@ export function ViewCart() {
                                     </li>
                                     <li>Description: {item.product.description}</li>
                                     <li>Price: {item.product.price}</li>
-                                    <li>Quantity: {item.quantity}</li>
+                                    <li>Quantity: <button onClick={e => handleUpdate(e, item.product.id, item.cartId)}>+</button> {item.quantity} <button onClick={e => handleUpdate(e, item.product.id, item.cartId)}>-</button></li>
                                     <li>Status: {item.product.status}</li>
                                     <li>Shop: {item.product.shop.name}</li>
-                                    <li>{item.isFavourite ? "Favourite" : "Not Favourite"}</li>
+                                    <li><button>{item.isFavourite ? "Favourite" : "Not Favourite"}</button></li>
                                 </ul>
                             </label>
                         </div>
