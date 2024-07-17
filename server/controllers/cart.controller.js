@@ -78,9 +78,9 @@ exports.deleteItemFromCart = async (req, res) => {
             }
         });
         if (isDecrease) {
-            res.status(200).send({success: true, message: "All items are removed from cart."});
+            res.status(200).send({success: true, message: "Item is removed from cart."});
         } else {
-            res.status(400).send({success: true, message: "Fail to remove all items from cart."});
+            res.status(400).send({success: true, message: "Fail to remove item from cart."});
         }
     } catch (error) {
         res.status(500).send({success: false, message: error.message});
@@ -125,6 +125,9 @@ exports.viewCart = async (req, res) => {
             where: {userId: req.params.userId}
         });
         const items = await Cart_item.findAll({
+            order: [ // get the favourite items first
+                ["isFavourite", "DESC"]
+            ],
             where: {
                 cartId: cart.id,
             },
@@ -147,3 +150,24 @@ exports.viewCart = async (req, res) => {
     }
 };
 
+// input: productId, cartId, isFavourite
+exports.updateFavourite = async (req, res) => {
+    try {
+        const isUpdated = await Cart_item.update({
+            isFavourite: req.body.isFavourite
+        },
+        {
+            where: {
+                productId: req.body.productId,
+                cartId: req.body.cartId
+            }
+        });
+        if (isUpdated != 1) {
+            res.status(404).send({success: false, message: "Item is not found."});
+            return;
+        };
+        res.status(200).send({success: true, message: "Item is updated."});
+    } catch (error) {
+        res.status(500).send({success: false, message: error.message});
+    }
+}

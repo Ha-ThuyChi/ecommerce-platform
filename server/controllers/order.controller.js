@@ -137,7 +137,7 @@ exports.updateStatus = async (req, res) => {
             res.status(404).send({status: false, message: "Order is not found."});
             return;
         }
-        res.status(200).send({status: true, message: "Order's status is updated."});
+        res.status(200).send({success: true, message: "Order's status is updated."});
     } catch (error) {
         res.status(500).send({success: false, message: error.message});
     }

@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { NavBar } from "../components/NavBar";
 import config from "../config";
 import { Link, useNavigate } from "react-router-dom";
+import { confirmAlert } from "react-confirm-alert";
+import 'react-confirm-alert/src/react-confirm-alert.css';
 
 async function fetchCart(userId, token, setCart) {
     try {
@@ -21,7 +23,7 @@ async function fetchCart(userId, token, setCart) {
     } catch (error) {
         console.error("Error while fetching user: ", error.message);
     }
-}
+};
 
 async function createOrder(token, values) {
     try {
@@ -37,7 +39,7 @@ async function createOrder(token, values) {
         console.log(result)
         return result;
     } catch (error) {
-        console.error("Error while fetching user: ", error.message);
+        console.error("Error while create order: ", error.message);
     }
 };
 
@@ -55,9 +57,45 @@ async function updateQuantity(token, values) {
         console.log(result)
         return result;
     } catch (error) {
-        console.error("Error while fetching user: ", error.message);
+        console.error("Error while update quantity: ", error.message);
     }
-}
+};
+
+async function updateFavourite(token, values) {
+    try {
+        const response = await fetch(config.serverLink + `/api/cart/update-favourite`, {
+            method: "PUT",
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type" : "application/json"
+            },
+            body: JSON.stringify(values)
+        });
+        const result = await response.json();
+        console.log(result)
+        return result;
+    } catch (error) {
+        console.error("Error while update favourite: ", error.message);
+    }
+};
+
+async function deleteItem(token, values) {
+    try {
+        const response = await fetch(config.serverLink + `/api/cart/delete-item`, {
+            method: "DELETE",
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(values)
+        });
+        const result = await response.json();
+        console.log(result)
+        return result;
+    } catch (error) {
+        console.error("Error while delete item: ", error.message);
+    }
+};
 
 export function ViewCart() {
     const [cart, setCart] = useState(null);
@@ -115,6 +153,49 @@ export function ViewCart() {
             alert(`${response.message}`);
         }
     };
+    async function handleFavourite(e, productId, cartId, favourite) {
+        e.preventDefault();
+        const isFavourite = !favourite;
+        const response = await updateFavourite(token, {
+            productId,
+            cartId,
+            isFavourite
+        });
+        console.log(response)
+        if (response.success) {
+            window.location.reload();
+        } else {
+            alert(`${response.message}`);
+        }
+    };
+    function handleDelete(e, productId, cartId, name) {
+        confirmAlert({
+            title: `DELETE PRODUCT`,
+            message: `Are you sure you want to delete ${name}?`,
+            buttons: [
+                {
+                    label: "Yes",
+                    onClick: async () => {
+                        const response = await deleteItem(token, {
+                            cartId, 
+                            productId
+                        });
+                        console.log(response)
+                        if (response.success) {
+                            alert(`Item ${name} is deleted successfully!`);
+                            window.location.reload();
+                        }
+                    },
+                },
+                {
+                    label: "No",
+                    onClick: () => {
+                        console.log("Cancel delete")
+                    },
+                }
+            ]
+        });
+    }
     return(
         <div>
             <NavBar/>
@@ -136,10 +217,18 @@ export function ViewCart() {
                                     </li>
                                     <li>Description: {item.product.description}</li>
                                     <li>Price: {item.product.price}</li>
-                                    <li>Quantity: <button onClick={e => handleUpdate(e, item.product.id, item.cartId)}>+</button> {item.quantity} <button onClick={e => handleUpdate(e, item.product.id, item.cartId)}>-</button></li>
+                                    <li>Quantity: {item.quantity > 1 ? (
+                                        <>
+                                            <button onClick={e => handleUpdate(e, item.product.id, item.cartId)}>+</button> {item.quantity} <button onClick={e => handleUpdate(e, item.product.id, item.cartId)}>-</button>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <button onClick={e => handleUpdate(e, item.product.id, item.cartId)}>+</button> {item.quantity} <button onClick={e => handleDelete(e, item.product.id, item.cartId, item.product.name)}>-</button>
+                                        </>
+                                    )}</li>
                                     <li>Status: {item.product.status}</li>
                                     <li>Shop: {item.product.shop.name}</li>
-                                    <li><button>{item.isFavourite ? "Favourite" : "Not Favourite"}</button></li>
+                                    <li><button onClick={e => handleFavourite(e, item.product.id, item.cartId, item.isFavourite)}>{item.isFavourite ? "Favourite" : "Not Favourite"}</button></li>
                                 </ul>
                             </label>
                         </div>

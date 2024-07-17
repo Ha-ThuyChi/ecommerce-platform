@@ -10,5 +10,6 @@ router.post("/add-item", controller.addItemToCart);
 router.delete("/delete-item", controller.deleteItemFromCart);
 router.put("/update-quantity", controller.updateQuantity)
 router.get("/view-cart/:userId", controller.viewCart);
+router.put("/update-favourite", controller.updateFavourite);
 
 module.exports = router;
